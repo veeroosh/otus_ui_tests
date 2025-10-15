@@ -1,20 +1,22 @@
 package org.example.pages;
 
-import static org.assertj.core.api.Assertions.assertThat;
-
+import com.google.inject.Inject;
 import org.example.annotations.Path;
+import org.example.scoped.GuiceScoped;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
 
 @Path("/catalog/courses")
 public class CatalogPage extends AbsBasePage<CatalogPage> {
 
-  public CatalogPage(WebDriver driver) {
-    super(driver);
+  @Inject
+  public CatalogPage(GuiceScoped guiceScoped) {
+    super(guiceScoped);
   }
 
-  public void checkCategoryFilterIsApplied(String categoryName) {
-    assertThat(getElement(By.xpath("//label[text()='" + categoryName + "']/..")).getAttribute("value"))
-        .isEqualTo("true");
+  public void findCourse(String courseName) {
+    WebElement searchInput = driver.findElement(By.xpath("//label[text()='Поиск']/.."));
+    actions.moveToElement(searchInput).click().perform();
+    actions.moveToElement(searchInput).sendKeys(courseName).perform();
   }
 }

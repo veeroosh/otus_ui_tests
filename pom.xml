@@ -15,14 +15,15 @@
 
         <selenium.version>4.34.0</selenium.version>
         <webdrivermanager.version>6.2.0</webdrivermanager.version>
-        <junit.version>5.13.4</junit.version>
+        <junit.version>5.10.0</junit.version>
+        <junit.platform.version>1.10.0</junit.platform.version>
         <guice.version>7.0.0</guice.version>
-        <assertj.version>3.27.3</assertj.version>
         <lombok.version>1.18.38</lombok.version>
         <jsoup.version>1.21.1</jsoup.version>
+        <cucumber.version>7.15.0</cucumber.version>
 
         <maven.version>3.14.0</maven.version>
-        <surefire.version>3.5.3</surefire.version>
+        <surefire.version>3.2.5</surefire.version>
         <spotbugs.version>4.9.3.2</spotbugs.version>
         <checkstyle.version>3.6.0</checkstyle.version>
     </properties>
@@ -48,13 +49,7 @@
 
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
-            <version>${junit.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-params</artifactId>
+            <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
         </dependency>
 
@@ -71,15 +66,27 @@
         </dependency>
 
         <dependency>
-            <groupId>org.assertj</groupId>
-            <artifactId>assertj-core</artifactId>
-            <version>${assertj.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.jsoup</groupId>
             <artifactId>jsoup</artifactId>
             <version>${jsoup.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-java</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-junit-platform-engine</artifactId>
+            <version>${cucumber.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>io.cucumber</groupId>
+            <artifactId>cucumber-guice</artifactId>
+            <version>${cucumber.version}</version>
         </dependency>
     </dependencies>
 

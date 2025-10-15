@@ -1,16 +1,18 @@
 package org.example.pages;
 
+import com.google.inject.Inject;
 import org.example.annotations.Path;
 import org.example.commons.AbsCommon;
 import org.example.exceptions.PathPageNotFoundException;
-import org.openqa.selenium.WebDriver;
+import org.example.scoped.GuiceScoped;
 
 public abstract class AbsBasePage<T> extends AbsCommon {
 
   protected String baseUrl = System.getProperty("base.url");
 
-  public AbsBasePage(WebDriver driver) {
-    super(driver);
+  @Inject
+  public AbsBasePage(GuiceScoped guiceScoped) {
+    super(guiceScoped);
   }
 
   private String getPath() {

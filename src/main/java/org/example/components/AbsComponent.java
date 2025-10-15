@@ -1,16 +1,19 @@
 package org.example.components;
 
+import com.google.inject.Inject;
 import org.example.annotations.Component;
 import org.example.commons.AbsCommon;
 import org.example.exceptions.ComponentSelectorNotValidException;
+import org.example.scoped.GuiceScoped;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import java.util.List;
 
 public abstract class AbsComponent extends AbsCommon {
-  public AbsComponent(WebDriver driver) {
-    super(driver);
+
+  @Inject
+  public AbsComponent(GuiceScoped guiceScoped) {
+    super(guiceScoped);
   }
 
   private By getByComponent() {

@@ -1,6 +1,7 @@
 package org.example.commons;
 
 import org.example.helpers.Waiter;
+import org.example.scoped.GuiceScoped;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -13,8 +14,8 @@ public class AbsCommon {
   protected Waiter waiter;
   protected Actions actions;
 
-  public AbsCommon(WebDriver driver) {
-    this.driver = driver;
+  public AbsCommon(GuiceScoped guiceScoped) {
+    this.driver = guiceScoped.driver;
     this.waiter = new Waiter(driver);
     this.actions = new Actions(driver);
 

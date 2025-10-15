@@ -2,27 +2,30 @@ package org.example.components;
 
 import static org.example.constants.Constants.getCourseLocatorByName;
 
+import com.google.inject.Inject;
 import org.apache.commons.lang3.tuple.Pair;
 import org.example.annotations.Component;
 import org.example.data.CourseData;
 import org.example.exceptions.ElementNotFoundException;
+import org.example.scoped.GuiceScoped;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import java.io.IOException;
 import java.time.MonthDay;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 
 @Component("//a/h6/..")
 public class CourseCard extends AbsComponent {
 
-  public CourseCard(WebDriver driver) {
-    super(driver);
+  @Inject
+  public CourseCard(GuiceScoped guiceScoped) {
+    super(guiceScoped);
   }
 
   public void clickCard(String courseName) {
@@ -34,7 +37,7 @@ public class CourseCard extends AbsComponent {
     return card.findElement(By.xpath("./h6")).getText();
   }
 
-  public Pair<MonthDay, String> getCourseStartDate(String courseName) {
+  private Pair<MonthDay, String> getCourseStartDate(String courseName) {
     Document document;
     try {
       document = Jsoup.connect(Objects.requireNonNull(driver.getCurrentUrl())).get();
@@ -50,37 +53,53 @@ public class CourseCard extends AbsComponent {
     } else throw new ElementNotFoundException();
   }
 
-  public List<CourseData> findEarliestAndLatestCourses() {
+  public List<CourseData> findCoursesByStartDate(String startDate) {
     List<WebElement> courseCards = getAllComponentEntity();
     courseCards.remove(0);
 
-    List<CourseData> minCourses = new ArrayList<>();
-    List<CourseData> maxCourses = new ArrayList<>();
-    MonthDay minDate = null;
-    MonthDay maxDate = null;
+    MonthDay dateCompareTo = MonthDay.parse(startDate, DateTimeFormatter.ofPattern("dd MMMM", new Locale("ru")));
 
-    for (WebElement card : courseCards) {
-      String courseName = getCourseName(card);
-      Pair<MonthDay, String> date = getCourseStartDate(courseName);
-      CourseData currentCourse = new CourseData(card, courseName, date.getRight());
+    return courseCards.stream()
+        .filter(courseElement -> getCourseStartDate(getCourseName(courseElement)).getLeft()
+            .compareTo(dateCompareTo) >= 0)
+        .map(course -> {
+          String courseName = getCourseName(course);
+          Pair<MonthDay, String> currentDate = getCourseStartDate(courseName);
+          return new CourseData(course, courseName, currentDate.getRight(), null);
+        })
+        .toList();
+  }
 
-      if (minDate == null || date.getLeft().compareTo(minDate) < 0) {
-        minDate = date.getLeft();
-        minCourses.clear();
-        minCourses.add(currentCourse);
-      } else if (date.getLeft().equals(minDate)) {
-        minCourses.add(currentCourse);
+  public List<CourseData> findCheapestAndMostExpensiveCourses() {
+    List<WebElement> courseCards = getAllComponentEntity();
+    courseCards.remove(0);
+
+    List<CourseData> courses = courseCards.stream().map(course -> {
+      actions.moveToElement(course).click().perform();
+      Document document;
+      String url = driver.getCurrentUrl();
+      if (url == null)
+        throw new NullPointerException();
+      else {
+        try {
+          document = Jsoup.connect(driver.getCurrentUrl()).get();
+        } catch (IOException e) {
+          throw new RuntimeException(e);
+        }
+        String courseTittle = document.selectXpath("//h1[1]").text();
+        Integer coursePrice = Integer.valueOf(document.selectXpath("(//h3)[1]/../div[2]").text().split(" ")[0]);
+        driver.navigate().back();
+        waiter.waitForElementPresence(By.xpath("//h1[normalize-space()='Каталог']"));
+        return new CourseData(null, courseTittle, null, coursePrice);
       }
+    }).toList();
 
-      if (maxDate == null || date.getLeft().compareTo(maxDate) > 0) {
-        maxDate = date.getLeft();
-        maxCourses.clear();
-        maxCourses.add(currentCourse);
-      } else if (date.getLeft().equals(maxDate)) {
-        maxCourses.add(currentCourse);
-      }
-    }
+    List<Integer> prices = courses.stream().map(CourseData::getPrice).toList();
+    Integer minPrice = prices.stream().min(Integer::compareTo).orElseThrow();
+    Integer maxPrice = prices.stream().max(Integer::compareTo).orElseThrow();
 
-    return Stream.concat(minCourses.stream(), maxCourses.stream()).toList();
+    return courses.stream()
+        .filter(course -> course.getPrice().equals(minPrice) || course.getPrice().equals(maxPrice))
+        .toList();
   }
 }

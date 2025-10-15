@@ -11,7 +11,7 @@ import java.time.Duration;
 public class Waiter {
 
   private WebDriver driver;
-  private final int waiterTimeout = Integer.parseInt(System.getProperty("waiter.timeout"));
+  private final int waiterTimeout = Integer.parseInt(System.getProperty("waiter.timeout", "8"));
 
   public Waiter(WebDriver driver) {
     this.driver = driver;
