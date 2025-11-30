@@ -1,0 +1,37 @@
+server {
+    listen {{ nginx_port }} default_server;
+
+    location / {
+      proxy_pass http://selenoid_ui_lat:{{ selenoid_ui_port }};
+      proxy_http_version        1.1;
+      proxy_set_header        Upgrade $http_upgrade;
+      proxy_set_header        Connection "Upgrade";
+      proxy_set_header        Host $host;
+      proxy_buffering         off;
+    }
+
+    location ~ /static/(js|css|media) {
+        proxy_pass http://selenoid_ui_lat:{{ selenoid_ui_port }};
+    }
+
+    location /status {
+        proxy_pass http://selenoid_ui_lat:{{ selenoid_ui_port }};
+    }
+
+    location /events {
+        proxy_pass http://selenoid_ui_lat:{{ selenoid_ui_port }};
+    }
+
+    location ~ /(logs|vnc)/ {
+        proxy_pass http://selenoid_ui_lat:{{ selenoid_ui_port }};
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+    }
+
+    location ~ /wd/hub {
+        proxy_pass http://ggr_lat:{{ ggr_port }};
+    }
+
+}

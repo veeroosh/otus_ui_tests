@@ -1,0 +1,9 @@
+- name: Selenoid playbook
+  hosts: latysheva_server
+  become: yes
+  remote_user: root
+  roles:
+    - docker
+    - docker_compose
+    - selenoid_conf
+    - selenoid

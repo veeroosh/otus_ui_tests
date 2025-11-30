@@ -1,0 +1,78 @@
+version: '3.9'
+
+services:
+  selenoid_lat1:
+    image: aerokube/selenoid:1.11.3
+    container_name: selenoid_lat1
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/latysheva/browsers.json:/etc/selenoid/browsers.json:ro
+    networks:
+      - selenoid_lat1
+    command: "-container-network=selenoid_lat1"
+    hostname: selenoid_lat1
+
+  selenoid_lat2:
+    image: aerokube/selenoid:1.11.3
+    container_name: selenoid_lat2
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /root/latysheva/browsers.json:/etc/selenoid/browsers.json:ro
+    networks:
+      - selenoid_lat2
+    command: "-container-network=selenoid_lat2"
+    hostname: selenoid_lat2
+
+  ggr_lat:
+    image: aerokube/ggr:1.7.2
+    container_name: ggr_lat
+    depends_on: [selenoid_lat1]
+    command: "-guests-allowed -guests-quota \"test\" -verbose"
+    networks:
+      - selenoid_lat1
+      - selenoid_lat2
+    volumes:
+      - /root/latysheva/ggr:/etc/grid-router:ro
+    hostname: ggr_lat
+
+  ggr_ui_lat:
+    image: aerokube/ggr-ui:1.2.0
+    container_name: ggr_ui_lat
+    depends_on: [ggr_lat]
+    volumes:
+      - /root/latysheva/ggr/quota:/etc/grid-router/quota:ro
+    networks:
+      - selenoid_lat1
+      - selenoid_lat2
+    hostname: ggr_ui_lat
+
+  selenoid_ui_lat:
+    image: aerokube/selenoid-ui:1.10.11
+    container_name: selenoid_ui_lat
+    depends_on: [ggr_ui_lat]
+    command: "--selenoid-uri http://ggr_ui_lat:8888"
+    networks:
+      - selenoid_lat1
+      - selenoid_lat2
+    hostname: selenoid_ui_lat
+
+  nginx_lat:
+    image: nginx:mainline-alpine3.22
+    depends_on: [ggr_lat, selenoid_ui_lat]
+    container_name: nginx_lat
+    volumes:
+      - /root/latysheva/nginx:/etc/nginx/conf.d
+    ports:
+      - {{ nginx_http_port }}:80
+    hostname: nginx_lat
+    networks:
+      - selenoid_lat1
+      - selenoid_lat2
+
+networks:
+  selenoid_lat1:
+    name: selenoid_lat1
+    external: true
+  selenoid_lat2:
+    name: selenoid_lat2
+    external: true
