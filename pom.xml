@@ -102,6 +102,8 @@
                     <systemPropertyVariables>
                         <base.url>https://otus.ru</base.url>
                         <waiter.timeout>8</waiter.timeout>
+                        <browser.name>chrome</browser.name>
+                        <selenoid.url>http://188.130.251.59/wd/hub</selenoid.url>
                     </systemPropertyVariables>
                 </configuration>
             </plugin>

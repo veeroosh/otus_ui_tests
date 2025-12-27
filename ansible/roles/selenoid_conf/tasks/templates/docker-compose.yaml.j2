@@ -9,7 +9,7 @@ services:
       - /root/latysheva/browsers.json:/etc/selenoid/browsers.json:ro
     networks:
       - selenoid_lat1
-    command: "-container-network=selenoid_lat1"
+    command: -container-network=selenoid_lat1
     hostname: selenoid_lat1
 
   selenoid_lat2:
@@ -20,14 +20,16 @@ services:
       - /root/latysheva/browsers.json:/etc/selenoid/browsers.json:ro
     networks:
       - selenoid_lat2
-    command: "-container-network=selenoid_lat2"
+    command: -container-network=selenoid_lat2
     hostname: selenoid_lat2
 
   ggr_lat:
     image: aerokube/ggr:1.7.2
     container_name: ggr_lat
-    depends_on: [selenoid_lat1]
-    command: "-guests-allowed -guests-quota \"test\" -verbose"
+    depends_on:
+      - selenoid_lat1
+      - selenoid_lat2
+    command: -guests-allowed -guests-quota "test" -verbose
     networks:
       - selenoid_lat1
       - selenoid_lat2
@@ -38,7 +40,8 @@ services:
   ggr_ui_lat:
     image: aerokube/ggr-ui:1.2.0
     container_name: ggr_ui_lat
-    depends_on: [ggr_lat]
+    depends_on:
+      - ggr_lat
     volumes:
       - /root/latysheva/ggr/quota:/etc/grid-router/quota:ro
     networks:
@@ -49,8 +52,9 @@ services:
   selenoid_ui_lat:
     image: aerokube/selenoid-ui:1.10.11
     container_name: selenoid_ui_lat
-    depends_on: [ggr_ui_lat]
-    command: "--selenoid-uri http://ggr_ui_lat:8888"
+    depends_on:
+      - ggr_ui_lat
+    command: --selenoid-uri http://ggr_ui_lat:8888
     networks:
       - selenoid_lat1
       - selenoid_lat2
@@ -58,7 +62,9 @@ services:
 
   nginx_lat:
     image: nginx:mainline-alpine3.22
-    depends_on: [ggr_lat, selenoid_ui_lat]
+    depends_on:
+      - ggr_lat
+      - selenoid_ui_lat
     container_name: nginx_lat
     volumes:
       - /root/latysheva/nginx:/etc/nginx/conf.d

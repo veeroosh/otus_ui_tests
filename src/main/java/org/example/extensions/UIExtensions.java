@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.AfterEachCallback;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.openqa.selenium.WebDriver;
+import java.net.MalformedURLException;
 
 public class UIExtensions implements BeforeEachCallback, AfterEachCallback {
 
@@ -17,13 +18,12 @@ public class UIExtensions implements BeforeEachCallback, AfterEachCallback {
 
   @Override
   public void afterEach(ExtensionContext context) {
-    if (driver != null) {
+    if (driver != null)
       driver.quit();
-    }
   }
 
   @Override
-  public void beforeEach(ExtensionContext context) {
+  public void beforeEach(ExtensionContext context) throws MalformedURLException {
     driver = new WebDriverFactory().getDriver();
     injector = Guice.createInjector(new PageGuiceModule(driver), new ComponentGuiceModule(driver));
     injector.injectMembers(context.getTestInstance().orElseThrow());
