@@ -9,7 +9,7 @@ timeout("1200") {
             currentBuild.description = "User: ${env.BUILD_USER}"
         }
 
-        def yamlConfig = readTrustedYaml text: "{$CONFIG}"
+        def yamlConfig = readYaml text: "${CONFIG}"
         sh "mkdir -p ./config"
 
         stage("Create env file") {
