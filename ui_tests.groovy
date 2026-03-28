@@ -10,17 +10,17 @@ timeout("1200") {
         }
 
 //        def yamlText = readFile "${CONFIG}"
-//        def yamlConfig = readYaml text: yamlText
 
         def configText = "${CONFIG}"
-        def config = new groovy.yaml.YamlSlurper().parseText(configText)
+        def yamlConfig = readYaml text: configText
+//        def config = new groovy.yaml.YamlSlurper().parseText(configText)
 
         sh "mkdir -p ./config"
 
         stage("Create env file") {
             dir("config") {
-                sh "BROWSER=${config['browser']} > ./.env"
-                sh "BROWSER_VERSION=${config['browser_version']} >> ./.env"
+                sh "BROWSER=${yamlConfig['browser']} > ./.env"
+                sh "BROWSER_VERSION=${yamlConfig['browser_version']} >> ./.env"
             }
         }
 
@@ -52,7 +52,7 @@ timeout("1200") {
 
         stage('Notification') {
             def message = """-----------UI TESTS-----------
-            brower: ${config['browser']}"""
+            brower: ${yamlConfig['browser']}"""
             testsStat.each { val ->
                 message += "$val\n"
             }
