@@ -1,0 +1,6 @@
+- name: Running UI tests
+  hosts: latysheva_server
+  become: yes
+  remote_user: root
+  roles:
+    - tests

@@ -9,18 +9,15 @@ timeout("1200") {
             currentBuild.description = "User: ${env.BUILD_USER}"
         }
 
-//        def yamlText = readFile "${CONFIG}"
-
         def configText = "${CONFIG}"
         def yamlConfig = readYaml text: configText
-//        def config = new groovy.yaml.YamlSlurper().parseText(configText)
 
         sh "mkdir -p ./config"
 
         stage("Create env file") {
             dir("config") {
                 sh "BROWSER=${yamlConfig['browser']} > ./.env"
-                sh "BROWSER_VERSION=${yamlConfig['browser_version']} >> ./.env"
+                sh "BROWSER_VERSION=${yamlConfig['base_url']} >> ./.env"
             }
         }
 
