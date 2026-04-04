@@ -101,6 +101,7 @@
                 <configuration>
                     <systemPropertyVariables>
                         <base.url>https://otus.ru</base.url>
+                        <browser>chrome</browser>
                         <waiter.timeout>8</waiter.timeout>
                     </systemPropertyVariables>
                 </configuration>

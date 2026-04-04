@@ -8,7 +8,6 @@ ENV BROWSER=chrome
 ENV ALLURE_VERSION=2.34.1
 
 WORKDIR /tests
-
 COPY . /tests
 
 RUN mvn clean install -DskipTests
@@ -20,11 +19,6 @@ RUN curl -L -o /tmp/allure.zip https://github.com/allure-framework/allure2/relea
 
 RUN mkdir -p /tests/allure-results /tests/allure-report
 
-CMD mvn clean test \
-      -Dbrowser=${BROWSER} \
-      -DbaseUrl=${BASE_URL} \
-      # -Durl=${URL} \
-      -Djava.awt.headless=false \
-      -Dsurefire.ignoreFailures=true \
-      -Dallure.results.directory=/tests/allure-results \
-    && allure generate /tests/allure-results -o /tests/allure-report --clean
+CMD ["sh", "-c", "mvn clean test -Dbrowser=${BROWSER} -DbaseUrl=${BASE_URL} \
+    -Dallure.results.directory=/tests/allure-results && allure generate /tests/allure-results \
+    -o /tests/allure-report --clean"]

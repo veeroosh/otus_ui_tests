@@ -12,7 +12,7 @@ import org.openqa.selenium.support.events.EventFiringDecorator;
 
 public class WebDriverFactory {
 
-  private final String browserName = System.getProperty("browser.name", "chrome");
+  private final String browserName = System.getProperty("browser", "chrome");
 
   public WebDriver getDriver() {
     return switch (browserName) {
