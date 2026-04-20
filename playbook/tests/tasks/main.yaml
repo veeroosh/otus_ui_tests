@@ -1,10 +1,24 @@
 ---
+- name: Debug docker env
+  ansible.builtin.shell: |
+    set -x
+    whoami
+    pwd
+    echo "DOCKER_HOST=$DOCKER_HOST"
+    python3 -c "import os; print('py=', os.sys.executable); print('DOCKER_HOST=', os.getenv('DOCKER_HOST'))"
+    ls -l /var/run/docker.sock || true
+    ls -l /run/user/*/docker.sock || true
+    docker version || true
+  register: dbg
+  changed_when: false
+
 - name: Build and push docker image
   community.docker.docker_image:
     name: "ui_tests"
     tag: "latest"
     repository: "localhost:5005/ui_tests"
     source: build
+    docker_host: "unix:///var/run/docker.sock"
     build:
       path: "/root/jenkins/workspace/ui_tests/"
       dockerfile: Dockerfile.ui_tests
