@@ -1,6 +1,6 @@
 ---
 - name: Build and push docker image
-  community.docker.docker_image_build:
+  community.docker.docker_image:
     name: "ui_tests"
     tag: "latest"
     repository: "localhost:5005/ui_tests"
