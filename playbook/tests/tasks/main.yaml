@@ -12,6 +12,9 @@
   register: dbg
   changed_when: false
 
+- debug:
+    var: dbg.stdout_lines
+
 - name: Build and push docker image
   community.docker.docker_image:
     name: "ui_tests"
