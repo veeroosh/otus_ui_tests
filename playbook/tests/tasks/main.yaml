@@ -1,19 +1,7 @@
 ---
-- name: Debug docker env
-  ansible.builtin.shell: |
-    set -x
-    whoami
-    pwd
-    echo "DOCKER_HOST=$DOCKER_HOST"
-    python3 -c "import os; print('py=', os.sys.executable); print('DOCKER_HOST=', os.getenv('DOCKER_HOST'))"
-    ls -l /var/run/docker.sock || true
-    ls -l /run/user/*/docker.sock || true
-    docker version || true
-  register: dbg
-  changed_when: false
-
-- debug:
-    var: dbg.stdout_lines
+- name: Resolve DOCKER_HOST
+  ansible.builtin.set_fact:
+    resolved_docker_host: "{{ lookup('env', 'DOCKER_HOST') | default('unix:///var/run/docker.sock', true) }}"
 
 - name: Build and push docker image
   community.docker.docker_image:
@@ -21,11 +9,11 @@
     tag: "latest"
     repository: "localhost:5005/ui_tests"
     source: build
-    docker_host: "unix:///var/run/docker.sock"
     build:
       path: "/root/jenkins/workspace/ui_tests/"
       dockerfile: Dockerfile.ui_tests
     push: yes
+    docker_host: "{{ resolved_docker_host }}"
 
 - name: Running UI tests
   community.docker.docker_container:
@@ -39,4 +27,5 @@
       BROWSER: "{{ browser }}"
       BASE_URL: "{{ base_url }}"
     output_logs: true
+    docker_host: "{{ resolved_docker_host }}"
   register: container_result
