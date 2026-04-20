@@ -1,0 +1,25 @@
+---
+- name: Build and push docker image
+  community.docker.docker_image_build:
+    name: "ui_tests"
+    tag: "latest"
+    repository: "localhost:5005/ui_tests"
+    source: build
+    build:
+      path: "/"
+      dockerfile: Dockerfile.ui_tests
+    push: yes
+
+- name: Running UI tests
+  community.docker.docker_container:
+    name: ui_tests
+    image: "localhost:5005/ui_tests:latest"
+    pull: true
+    detach: false
+    auto_remove: false
+    network_mode: host
+    env:
+      BROWSER: "{{ browser }}"
+      BASE_URL: "{{ base_url }}"
+    output_logs: true
+  register: container_result
