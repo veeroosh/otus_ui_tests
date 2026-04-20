@@ -6,7 +6,7 @@
     repository: "localhost:5005/ui_tests"
     source: build
     build:
-      path: "/"
+      path: "/root/jenkins/workspace/ui_tests/"
       dockerfile: Dockerfile.ui_tests
     push: yes
 
